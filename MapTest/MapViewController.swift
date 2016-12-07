@@ -17,7 +17,7 @@ struct Intersect
     /*
      Checks whether a given parking zone is within the circular region
      */
-    func check(location: CLLocationCoordinate2D, line: MapLine, radius: Double) -> Bool
+    func check(location: CLLocationCoordinate2D, line: MapLine, radius: Double, color: String) -> Bool
     {
         //conversion units
         let mileConversion = 69.11
@@ -49,10 +49,25 @@ struct Intersect
             //If location is contained within or touches the circular region
             if((leftBound >= 0 && leftBound <= 1) || (rightBound >= 0 && rightBound <= 1) || (leftBound <= 0 && rightBound >= 1))
             {
-                return true
+                if(color.lowercased() == line.c.lowercased() || color == "")
+                {
+                    return true
+                }
             }
             return false
         }
+    }
+    
+    /*
+     Checks if a point is contained in a line
+    */
+    func within(coor: CLLocationCoordinate2D, line: MapLine) -> Bool
+    {
+        if abs((line.l.coordinate).latitude - coor.latitude) < 0.01 && abs((line.l.coordinate).longitude - coor.longitude) < 0.01
+        {
+            return true
+        }
+        return false
     }
 }
 
@@ -64,6 +79,11 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     @IBOutlet weak var showButton: UIButton!
     @IBOutlet weak var hideButton: UIButton!
     @IBOutlet weak var radiusTextField: UITextField!
+    @IBOutlet weak var colorTextField: UITextField!
+    @IBOutlet weak var locationLabel: UILabel!
+    @IBOutlet weak var restrictionsLabel: UILabel!
+    @IBOutlet weak var availabilityLabel: UILabel!
+    @IBOutlet weak var pricingLabel: UILabel!
     
     //Location and Database references
     let locationManager = CLLocationManager()
@@ -72,7 +92,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     //Local Variables
     var lineColor = UIColor.white.withAlphaComponent(0.5)
     var parkingLines: [MapLine] = []
-    
+    var loadedlines: [MKPolylineRenderer] = []
     
     override func viewDidLoad()
     {
@@ -91,6 +111,9 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         //Adjust Button Size Font
         showButton.titleLabel?.adjustsFontSizeToFitWidth = true
         hideButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        
+        //Gestures
+        mapView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapPolyline)))
         
         //Calls loadLines to retrieve lines from database
         loadLines()
@@ -120,13 +143,14 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     {
         ref.child("Zones").observe(.childAdded, with:
             { (snapshot) -> Void in
+                let location = snapshot.key
                 let color = (snapshot.value as? NSDictionary)?["Color"] as? String ?? ""
                 let coordinate1 = CLLocationCoordinate2D.init(latitude: CLLocationDegrees((snapshot.value as? NSDictionary)?["Coordinate1Latitude"] as? CGFloat ?? 0), longitude: CLLocationDegrees((snapshot.value as? NSDictionary)?["Coordinate1Longitude"] as? CGFloat ?? 0))
                 let coordinate2 = CLLocationCoordinate2D.init(latitude: CLLocationDegrees((snapshot.value as? NSDictionary)?["Coordinate2Latitude"] as? CGFloat ?? 0), longitude: CLLocationDegrees((snapshot.value as? NSDictionary)?["Coordinate2Longitude"] as? CGFloat ?? 0))
                 let detail = (snapshot.value as? NSDictionary)?["Detail"] as? String ?? ""
                 let price = (snapshot.value as? NSDictionary)?["Price"] as? Double ?? 0
                 let timing = (snapshot.value as? NSDictionary)?["Timings"] as? String ?? ""
-                self.parkingLines.append(MapLine.init(color: color, coordinate1: coordinate1, coordinate2: coordinate2, details: detail, prices: price, timings: timing))
+                self.parkingLines.append(MapLine.init(location: location, color: color, coordinate1: coordinate1, coordinate2: coordinate2, details: detail, prices: price, timings: timing))
         })
     }
     
@@ -139,7 +163,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         {
             if(intersects(line: line))
             {
-                lineColor = line.c
+                lineColor = line.returnColor()
                 self.mapView.add(line.l)
             }
         }
@@ -161,11 +185,17 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         case("Show"):
             if(radiusTextField.text != "")
             {
+                eraseLines()
                 drawLines()
             }
         case("Hide"):
             eraseLines()
             radiusTextField.text = "0"
+            colorTextField.text = ""
+            locationLabel.text = "Location: "
+            restrictionsLabel.text = "Restrictions: "
+            availabilityLabel.text = "Availability: "
+            pricingLabel.text = "Pricing: "
         default: break
         }
     }
@@ -178,6 +208,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         let polyLineRenderer = MKPolylineRenderer(overlay: overlay)
         polyLineRenderer.strokeColor = lineColor;
         polyLineRenderer.lineWidth = 5;
+        loadedlines.append(polyLineRenderer)
         return polyLineRenderer;
     }
     
@@ -186,8 +217,43 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     */
     func intersects(line: MapLine) -> Bool
     {
-        return Intersect().check(location: CLLocationCoordinate2D.init(latitude: (locationManager.location?.coordinate.latitude)!, longitude: (locationManager.location?.coordinate.longitude)!), line: line, radius: Double(radiusTextField.text!)!)
+        if let rad = Double(radiusTextField.text!)
+        {
+            if let col = colorTextField.text
+            {
+                if let location = locationManager.location
+                {
+                    return Intersect().check(location: CLLocationCoordinate2D.init(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude), line: line, radius: rad, color: col)
+                }
+            }
+        }
+        return false
     }
+    
+    @IBAction func tapPolyline(_ sender: UITapGestureRecognizer)
+    {
+        let coor = mapView.convert(sender.location(in: mapView), toCoordinateFrom: mapView)
+        var found = false
+        for line in parkingLines
+        {
+            if(Intersect().within(coor: coor, line: line))
+            {
+                locationLabel.text = "Location: " + line.loc
+                restrictionsLabel.text = "Restrictions: " + line.t
+                availabilityLabel.text = "Availability: " + line.d
+                pricingLabel.text = "Pricing: " + String(line.p)
+                found = true
+            }
+        }
+        if !found
+        {
+            locationLabel.text = "Location: "
+            restrictionsLabel.text = "Restrictions: "
+            availabilityLabel.text = "Availability: "
+            pricingLabel.text = "Pricing: "
+        }
+    }
+    
 }
 
 

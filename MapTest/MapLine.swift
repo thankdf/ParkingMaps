@@ -31,7 +31,8 @@ struct CONSTANT
 
 class MapLine: NSObject
 {
-    var c: UIColor = UIColor.white.withAlphaComponent(0.5)
+    var loc: String
+    var c: String
     var l: MKPolyline
     var coor1: CLLocationCoordinate2D
     var coor2: CLLocationCoordinate2D
@@ -39,19 +40,10 @@ class MapLine: NSObject
     var p: Double
     var t: String
     
-    init(color: String, coordinate1: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D, details: String, prices: Double, timings: String)
+    init(location: String, color: String, coordinate1: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D, details: String, prices: Double, timings: String)
     {
-        switch(color)
-        {
-        case("White"): c = CONSTANT.White
-        case("Purple"): c = CONSTANT.Purple
-        case("Orange"): c = CONSTANT.Orange
-        case("Green"): c = CONSTANT.Green
-        case("Blue"): c = CONSTANT.Blue
-        case("Brown"): c = CONSTANT.Brown
-        case("Magenta"): c = CONSTANT.Magenta
-        default: break
-        }
+        loc = location
+        c = color
         l = MKPolyline.init(coordinates: [coordinate1, coordinate2])
         coor1 = coordinate1
         coor2 = coordinate2
@@ -60,6 +52,18 @@ class MapLine: NSObject
         t = timings
     }
     
-    
-    
+    func returnColor() -> UIColor
+    {
+        switch(c.lowercased())
+        {
+        case("white"): return CONSTANT.White
+        case("purple"): return CONSTANT.Purple
+        case("orange"): return CONSTANT.Orange
+        case("green"): return CONSTANT.Green
+        case("blue"): return CONSTANT.Blue
+        case("brown"): return CONSTANT.Brown
+        case("magenta"): return CONSTANT.Magenta
+        default: return CONSTANT.White
+        }
+    }
 }
