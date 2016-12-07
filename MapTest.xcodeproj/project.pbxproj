@@ -15,7 +15,6 @@
 		85D99DCE1DB865A3004CCB5F /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D99DCD1DB865A3004CCB5F /* MapViewController.swift */; };
 		85D99DD11DB865A4004CCB5F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85D99DCF1DB865A4004CCB5F /* Main.storyboard */; };
 		85D99DD31DB865A4004CCB5F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85D99DD21DB865A4004CCB5F /* Assets.xcassets */; };
-		85D99DD61DB865A4004CCB5F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85D99DD41DB865A4004CCB5F /* LaunchScreen.storyboard */; };
 		B31C1FD673DC7DCFF7615FF8 /* Pods_MapTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413B9AE07E1AD36AD52361C5 /* Pods_MapTest.framework */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +38,6 @@
 		85D99DCD1DB865A3004CCB5F /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		85D99DD01DB865A4004CCB5F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		85D99DD21DB865A4004CCB5F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		85D99DD51DB865A4004CCB5F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		85D99DD71DB865A4004CCB5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9AF4FFDFD429F10F27104BA /* Pods-MapTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MapTest/Pods-MapTest.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -128,7 +126,6 @@
 				6A94F3121DF3DAD60099AE7F /* MapLine.swift */,
 				85D99DCF1DB865A4004CCB5F /* Main.storyboard */,
 				85D99DD21DB865A4004CCB5F /* Assets.xcassets */,
-				85D99DD41DB865A4004CCB5F /* LaunchScreen.storyboard */,
 				6A1A5F171DF3B4A300B46B1C /* GoogleService-Info.plist */,
 				85D99DD71DB865A4004CCB5F /* Info.plist */,
 			);
@@ -203,7 +200,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				85D99DD61DB865A4004CCB5F /* LaunchScreen.storyboard in Resources */,
 				6A1A5F181DF3B4A300B46B1C /* GoogleService-Info.plist in Resources */,
 				85D99DD31DB865A4004CCB5F /* Assets.xcassets in Resources */,
 				85D99DD11DB865A4004CCB5F /* Main.storyboard in Resources */,
@@ -280,14 +276,6 @@
 				85D99DD01DB865A4004CCB5F /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		85D99DD41DB865A4004CCB5F /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				85D99DD51DB865A4004CCB5F /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

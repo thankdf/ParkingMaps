@@ -115,6 +115,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         //Gestures
         mapView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapPolyline)))
         
+        //Observers
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name:NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
         //Calls loadLines to retrieve lines from database
         loadLines()
     }
@@ -254,6 +258,13 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         }
     }
     
+    func keyboardWillShow(sender: NSNotification) {
+        self.view.frame.origin.y = -350
+    }
+    
+    func keyboardWillHide(sender: NSNotification) {
+        self.view.frame.origin.y = 0
+    }
 }
 
 
